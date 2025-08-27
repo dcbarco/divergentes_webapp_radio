@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Divergentes</title>
+    
+    <script>
+        function setDailyBackground() {
+            const images = [
+                'backgrounds/Cuadro 1.159Z.png',
+                'backgrounds/cuadro 2.676Z.png',
+                'backgrounds/cuadro 3.654Z.png',
+                'backgrounds/cuadro 4.408Z.png',
+                'backgrounds/cuadro 5.381Z.png',
+                'backgrounds/cuadro 6.885Z.png'
+            ];
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            const imageIndex = dayOfYear % images.length;
+            const imageUrl = images[imageIndex];
+            const backgroundContainer = document.getElementById('ai-background-container');
+
+            // Create a new image to preload it
+            const img = new Image();
+            img.onload = function() {
+                backgroundContainer.style.backgroundImage = `url('${imageUrl}')`;
+                backgroundContainer.style.opacity = '1'; // Make it visible
+            };
+            img.src = imageUrl;
+        }
+        window.onload = setDailyBackground;
+    </script>
+
+    <!-- Librerías Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- TODO EL CSS PERSONALIZADO VA AQUÍ, DENTRO DEL HTML -->
+    <style>
+        /* --- Estilos Generales y de Fondo --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background-color: #1a202c;
+        }
+        #background-container {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(-45deg, #4c1d95, #1e293b, #0f172a, #9333ea);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+            z-index: -2;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        #ai-background-container {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover; background-position: center;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .backdrop-blur-custom {
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Ensure hidden class works properly */
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Contenedores Principales --- */
+        .player-controls-container {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+        }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        #player-main-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* --- Controles de Reproducción Centrales --- */
+        #player-controls-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+        }
+        #central-play-button-container {
+            position: relative;
+        }
+        #central-play-button-bg {
+            position: absolute;
+            width: 9.5rem; 
+            height: 9.5rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background-color: rgba(26, 32, 44, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        #central-play-button {
+            position: relative;
+            width: 8rem; height: 8rem;
+            border-radius: 50%; background: radial-gradient(circle, #fb923c, #f97316);
+            box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+        #central-play-button:hover { transform: scale(1.05); }
+        #central-play-button:active { transform: scale(0.98); }
+        #central-play-button svg {
+            width: 4rem; height: 4rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+        }
+        #central-play-button.is-playing::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #22c55e;
+            z-index: -1;
+            animation: sonar-effect 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        @keyframes sonar-effect {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4); }
+            50% { box-shadow: 0 8px 35px rgba(251, 146, 60, 0.6); }
+        }
+
+
+        /* --- Controles de Volumen --- */
+        .volume-button {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background-color: rgba(26, 32, 44, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 2.25rem;
+            font-weight: 500;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .volume-button:hover {
+            background-color: rgba(45, 55, 72, 0.7);
+        }
+        .volume-button:active {
+            transform: scale(0.95);
+        }
+        #volume-feedback-container {
+            position: absolute;
+            left: calc(100% + 1rem);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 60px;
+            background-color: rgba(26, 32, 44, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #volume-feedback-bar {
+            width: 100%;
+            height: 75%;
+            background-color: #fb923c;
+            transition: height 0.2s ease-out;
+        }
+
+        /* --- Metadatos Flotantes y Visualizador --- */
+        #floating-metadata-modal {
+            position: relative;
+            width: 90%;
+            max-width: 580px;
+            background: linear-gradient(to right, rgba(35, 27, 56, 0.7), rgba(46, 36, 74, 0.8));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-out;
+        }
+        #floating-metadata-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        #floating-metadata-text { 
+            text-align: left; 
+            flex-grow: 1;
+            min-width: 0;
+        }
+        #floating-metadata-title, #floating-metadata-artist {
+            white-space: normal;
+        }
+        #floating-metadata-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.3;
+            margin: 0;
+        }
+        #floating-metadata-artist {
+            font-size: 0.75rem;
+            font-weight: 200;
+            color: #e5e7eb;
+            opacity: 0.9;
+            line-height: 1.3;
+            margin: 0;
+        }
+        #modal-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 20px;
+        }
+        #modal-visualizer span {
+            width: 3px;
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            transition: height 0.3s ease;
+        }
+        #modal-visualizer.active span:nth-child(1) { animation: modal-visualizer-dance 1.2s infinite ease-in-out 0s; }
+        #modal-visualizer.active span:nth-child(2) { animation: modal-visualizer-dance 1.2s infinite ease-in-out 0.2s; }
+        #modal-visualizer.active span:nth-child(3) { animation: modal-visualizer-dance 1.2s infinite ease-in-out 0.4s; }
+
+        @keyframes modal-visualizer-dance {
+            0%, 100% { height: 4px; }
+            50% { height: 20px; }
+        }
+
+        /* --- Logo y Shows --- */
+        #logo-live-button {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            position: relative;
+        }
+        #logo-live-button:hover {
+            transform: scale(1.05);
+        }
+        #live-text {
+            animation: live-pulse 2s infinite ease-in-out;
+            text-shadow: 0 0 5px #fb923c, 0 0 10px #fb923c;
+        }
+        @keyframes live-pulse {
+            0%, 100% { opacity: 0.75; }
+            50% { opacity: 1; }
+        }
+        #shows-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background-color: rgba(0,0,0,0.5); z-index: 45;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        #shows-container.visible {
+            opacity: 1; visibility: visible; transition: opacity 0.3s ease;
+        }
+
+        /* --- Modales --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8);
+            display: flex; align-items: center; justify-content: center; z-index: 1000; 
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+        .modal-content {
+            background-color: #2d3748; padding: 1.5rem; border-radius: 0.5rem; width: 90%;
+            max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative;
+            transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            color: #fb923c;
+            font-size: 1.5rem;
+            line-height: 2rem;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .modal-close-btn:hover {
+             transform: scale(1.1);
+             background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* --- Barra de Navegación Inferior --- */
+        .section-nav-button {
+            background-color: transparent; border: none; flex-grow: 1; min-width: 0; padding: 4px;
+        }
+        .section-nav-button:hover { background-color: rgba(45, 55, 72, 0.5); }
+
+        /* --- Podcasts --- */
+        .podcast-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .podcast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(251, 146, 60, 0.2), 0 4px 6px -2px rgba(251, 146, 60, 0.1);
+        }
+        .podcast-carousel-container { position: relative; }
+        .podcast-carousel { scroll-behavior: smooth; }
+        .podcast-carousel::-webkit-scrollbar { height: 8px; }
+        .podcast-carousel::-webkit-scrollbar-thumb { background-color: #fb923c; border-radius: 10px; }
+        .podcast-carousel::-webkit-scrollbar-track { background-color: #4b5563; border-radius: 10px; }
+        .carousel-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(0,0,0,0.6);
+            color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; z-index: 10; transition: background-color 0.3s ease;
+        }
+        .carousel-arrow:hover { background-color: rgba(251, 146, 60, 0.8); }
+        .carousel-arrow.left { left: 10px; }
+        .carousel-arrow.right { right: 10px; }
+        .podcast-image-container { position: relative; width: 100%; height: 8rem; }
+        .podcast-image-spinner {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #fb923c;
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+        }
+        #podcast-actions-container, #stream-actions-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .action-icon {
+            cursor: pointer;
+        }
+        .action-icon svg {
+            width: 1.75rem;
+            height: 1.75rem;
+            color: #fb923c;
+            transition: transform 0.2s, filter 0.2s;
+        }
+        .action-icon:hover svg {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px #fb923c);
+        }
+
+        /* --- Feedback Toast --- */
+        .feedback-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1f2937;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .feedback-toast.show {
+            opacity: 1;
+            transform: translate(-50%, -6.5rem);
+        }
+
+        /* --- Modal de Información IA --- */
+        #llm-info-modal .modal-content {
+            max-width: 450px;
+        }
+        #llm-modal-content-area {
+            position: relative;
+            min-height: 4rem;
+        }
+        #llm-response-text {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+        .ai-disclaimer {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            text-align: center;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 0.5rem;
+            font-weight: 200;
+        }
+        .horizontal-loader {
+            width: 80%; height: 3px;
+            background-color: rgba(251, 146, 60, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+        }
+        .horizontal-loader::after {
+            content: '';
+            width: 40%;
+            height: 100%;
+            background-color: #fb923c;
+            position: absolute;
+            animation: loader-slide 2s infinite ease-in-out;
+        }
+        @keyframes loader-slide {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <!-- Contenedores para los fondos -->
+    <div id="background-container"></div>
+    <div id="ai-background-container"></div>
+    
+    <!-- Reproductor Principal (Centro de la pantalla) -->
+    <main id="player-main-container">
+        <div id="player-controls-wrapper">
+            <button id="volume-down-button" class="volume-button">-</button>
+            <div id="central-play-button-container">
+                <div id="central-play-button-bg"></div>
+                <div id="central-play-button">
+                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.648c1.295.742 1.295 2.545 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653z" /></svg>
+                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M5.25 6.375a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM5.25 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zM5.25 17.625a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM14.25 6.375a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM14.25 17.625a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75z"></path></svg>
+                </div>
+            </div>
+            <button id="volume-up-button" class="volume-button">+</button>
+            <div id="volume-feedback-container">
+                <div id="volume-feedback-bar"></div>
+            </div>
+        </div>
+
+        <div id="floating-metadata-modal">
+            <div id="floating-metadata-text">
+                <p id="floating-metadata-title">Radio Divergentes</p>
+                <p id="floating-metadata-artist">En vivo</p>
+            </div>
+            <div id="modal-visualizer">
+                <span></span><span></span><span></span>
+            </div>
+            <div id="podcast-actions-container" class="hidden">
+                  <div id="view-info-icon" class="action-icon" title="Ver Info Podcast">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+            </div>
+            <div id="stream-actions-container">
+                  <div id="stream-info-icon" class="action-icon" title="Datos Divergentes">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Logo y Botón de Shows -->
+    <div class="absolute top-4 left-4 z-40">
+        <div id="logo-live-button" title="Sintoniza la Radio">
+            <img src="https://i.ibb.co/W4zdnRb5/Miniatura.jpg" alt="Logo de Divergentes" class="h-16 w-auto rounded-md shadow-lg" onerror="this.onerror=null;this.src='https://placehold.co/64x64/1a202c/ffffff?text=Logo';">
+            <p id="live-text" class="text-xs text-center mt-1">Al Aire</p>
+        </div>
+    </div>
+
+    <div id="shows-container">
+        <div class="backdrop-blur-custom p-3 sm:p-6 rounded-lg shadow-2xl w-full max-w-md bg-gray-900 bg-opacity-70">
+            <iframe height="300px" width="100%" scrolling="yes" frameborder="0" src="https://rn5zosh0x4ouv.pl.zeno.fm/embed/weekly-program" class="rounded-md"></iframe>
+        </div>
+    </div>
+    
+    <!-- Barra de Navegación Inferior y Secciones de Contenido -->
+    <div class="player-controls-container bg-gray-900 bg-opacity-80 backdrop-blur-custom shadow-t-2xl">
+        <div id="bottom-controls-wrapper" class="relative">
+            <div class="flex justify-around items-center p-2 bg-gray-700 bg-opacity-60 border-t border-gray-600">
+                <button onclick="showSection('podcasts')" class="section-nav-button text-white hover:text-orange-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2-2H4a2 2 0 01-2-2v-4z"></path></svg>
+                    <span class="text-xs">Podcasts</span>
+                </button>
+                <button onclick="showSection('descripcion')" class="section-nav-button text-white hover:text-orange-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                    <span class="text-xs">Divergentes</span>
+                </button>
+                <button onclick="toggleShows()" class="section-nav-button text-white hover:text-blue-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                    <span class="text-xs">Shows</span>
+                </button>
+                <button id="share-button" class="section-nav-button text-white hover:text-green-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"></path></svg>
+                    <span class="text-xs">Compartir</span>
+                </button>
+                <button id="close-section-button" onclick="closeAll()" class="section-nav-button text-red-500 hover:text-red-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 flex flex-col items-center justify-center hidden">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                    <span class="text-xs">Cerrar</span>
+                </button>
+            </div>
+        </div>
+        
+        <div id="podcasts-section" class="content-section p-4 bg-gray-800 bg-opacity-90 max-h-96 overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4 text-center text-orange-400">Investigación científica hecha podcast</h2>
+            <div class="podcast-carousel-container px-4 sm:px-10"> 
+                <div id="carousel-arrow-left" class="carousel-arrow left"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg></div>
+                <div id="podcast-carousel-content" class="podcast-carousel flex overflow-x-auto space-x-4 pb-4"></div>
+                <div id="carousel-arrow-right" class="carousel-arrow right"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
+            </div>
+        </div>
+        <div id="descripcion-section" class="content-section p-6 bg-gray-800 bg-opacity-90 max-h-96 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6 text-center text-orange-400">Sobre Divergentes Radio</h2>
+            <div class="text-center mb-4 px-4"><p class="text-sm leading-relaxed">Divergentes es la emisora online del Centro de Ciencia Francisco José de Caldas, un espacio sonoro que vibra con la ciencia, la tecnología, la sociedad y las múltiples formas de conocimiento. Nace con el propósito de expandir nuestras voces, nuestras preguntas y nuestras apuestas por una comunicación cercana, crítica y diversa. Esta emisora responde a nuestros ejes misionales de comunicación de la ciencia, mediación tecnológica, participación ciudadana y, sobre todo, apropiación social del conocimiento. En Divergentes hay lugar para la música, los podcast, los programas en vivo y todo aquello que nos permita cruzar fronteras entre saberes e ideas.</p></div>
+            <h3 class="text-xl font-semibold mb-4 text-center text-orange-300">Gracias a:</h3>
+            <div class="flex justify-center items-center"><img src="https://i.ibb.co/vGg1DHy/logos-en-blanco-02.png" alt="Logos de Aliados" class="h-auto w-full max-w-lg rounded" onerror="this.onerror=null;this.src='https://placehold.co/512x100/1a202c/ffffff?text=Aliados';"></div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div id="podcast-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modal-close-button" class="modal-close-btn">×</button>
+            <img id="modal-podcast-image" src="" alt="Imagen de Portada del Podcast" class="w-full h-48 object-cover rounded-md mb-4">
+            <h2 id="modal-podcast-title" class="text-xl font-bold mb-2 text-orange-400"></h2>
+            <div class="mb-3">
+                <h3 class="text-md font-semibold text-orange-300 mb-1">Descripción:</h3>
+                <p id="modal-podcast-description" class="text-xs text-gray-300 leading-relaxed"></p>
+            </div>
+            <div class="mb-3">
+                <h3 class="text-md font-semibold text-orange-300 mb-1">Autores:</h3>
+                <p id="modal-podcast-authors" class="text-xs text-gray-300"></p>
+            </div>
+             <div class="mb-4 flex flex-wrap gap-2 items-center">
+                <a id="modal-article-link" href="#" target="_blank" class="inline-block bg-gray-600 hover:bg-gray-500 text-white font-semibold py-1 px-3 rounded-lg text-xs">Ver Artículo Original</a>
+            </div>
+            <div class="flex space-x-3">
+                <button id="play-es-button" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-xs flex-1">Reproducir en Español</button>
+                <button id="play-en-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-xs flex-1">Play in English</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="llm-info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-2">
+                 <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1" />
+                    </svg>
+                    Datos Divergentes
+                </h2>
+                <button id="llm-modal-close-button" class="modal-close-btn">×</button>
+            </div>
+            <div id="llm-modal-content-area">
+                <div id="llm-loading-spinner" class="horizontal-loader hidden"></div>
+                <p id="llm-response-text" class="text-sm text-gray-300 leading-relaxed mt-4"></p>
+                <p class="ai-disclaimer">Información construida y consultada con el uso de IA</p>
+            </div>
+        </div>
+    </div>
+    <div id="feedback-toast" class="feedback-toast"></div>
+
+    <!-- Reproductor de Audio -->
+    <audio id="master-audio-player" preload="metadata"></audio>
+    
+    <!-- TODO EL JAVASCRIPT DE LA APLICACIÓN -->
+    <script>
+        // --- Constantes y Variables Globales ---
+        const STREAM_URL = 'https://stream.zeno.fm/rn5zosh0x4ouv';
+        const METADATA_API_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/rn5zosh0x4ouv';
+        
+        let masterAudio, isPlaying = false, currentAudioSource = 'stream', currentPodcast = null, metadataEventSource = null;
+        let volumeFeedbackTimeout = null;
+        let activeSectionId = null;
+        let dom = {};
+
+        const podcastData = [
+            { cardTitle: "Bacteria Staphylococcus aureus", cardSubtitle: "Mastitis bovina en 8 países.", imageUrl: "https://archive.org/download/lienzo-cultural-imagen-2025-06-10-T22-29-45-383-Z/lienzo-cultural-imagen-2025-06-10-T22-29-45-383-Z.jpg", audioEs: "https://dn721906.ca.archive.org/0/items/sp-genotipos-y-toxinas-de-s-aureus-en-mastitis-bovina-global/Sp_Genotipos%20y%20Toxinas%20de%20S_%20aureus%20en%20Mastitis%20Bovina%20Global.mp3", audioEn: "https://dn721707.ca.archive.org/0/items/en-genotipos-y-toxinas-de-s-aureus-en-mastitis-bovina-global-ver-2/En_Genotipos%20y%20Toxinas%20de%20S_%20aureus%20en%20Mastitis%20Bovina%20Global_Ver2.mp3", titleEs: "Aislamientos de Staphylococcus aureus de mastitis bovina en ocho países", titleEn: "Staphylococcus aureus Isolates from Bovine Mastitis in Eight Countries", descriptionEs: "Este estudio examinó 120 muestras de Staphylococcus aureus de mastitis bovina en ocho países para entender su diversidad genética. Los hallazgos mostraron una variedad de genotipos, con patrones específicos para cada país. Los genes asociados con la adhesión e invasión del huésped fueron los más comunes, sugiriendo la persistencia de la bacteria. La caracterización de cepas es crucial para gestionar la infección.", authorsEs: "Valentina Monistero, Hans Ulrich Graber, Claudia Pollera, Paola Cremonesi , Bianca Castiglioni , Enriqueta Bottini , Laura Lasso-Rojas , Volker Kroemker , Nicole Wente , Inge-Marie Petzer , Carlos Santisteban , Jeff Runyan , Marcos Veiga dos Santos , Bruna Gomes Alves , Renata Piccinini , Valerio Bronzo , Mohamed Salah Abbassi , Meriam Ben Said and Paolo Moroni", authorUcaldasEs: "Alejandro Ceballos-Marquez", articleLink: "https://www.mdpi.com/2072-6651/10/6/247" },
+            { cardTitle: "Canal Centroamericano", cardSubtitle: "Un estudio del Mioceno.", imageUrl: "https://archive.org/download/canal_centroamericano/canal_centroamericano.png", audioEs: "https://dn721709.ca.archive.org/0/items/sp-desaparicion-miocena-del-pasaje-centroamericano/Sp_Desaparicio%CC%81n%20Miocena%20del%20Pasaje%20Centroamericano.mp3", audioEn: "https://dn721606.ca.archive.org/0/items/en-desaparicion-miocena-del-pasaje-centroamericano/En_Desaparicio%CC%81n%20Miocena%20del%20Pasaje%20Centroamericano.mp3", titleEs: "Desaparición del canal centroamericano durante el Mioceno", titleEn: "Miocene vanishing of the Central American Seaway", descriptionEs: "Este artículo investiga la cronología del cierre del Paso Marítimo Centroamericano, un evento geológico que impactó la circulación oceánica y la conexión terrestre entre Norte y Sudamérica. El estudio indica que las condiciones oceánicas en la zona de sutura de Uramita comenzaron a desaparecer entre el Mioceno Medio y Tardío, sugiriendo un cierre más complejo y asincrónico de lo que se creía.", authorsEs: "Felipe Vallejo-Hincapié, Ángel Barbosa-Espitia, Daniela Aguirre, Sergio A. Celis, Carlos A. Giraldo-Villegas, Ángelo Plata-Torres, Raúl Trejos-Tamayo, Andrés Salazar-Ríos, José-Abel Flores, Marie-Pierre Aubry, Fabián Gallego, Eduardo Delgado, and David Foster", authorUcaldasEs: "Andrés Pardo-Trujillo", articleLink: "https://drive.google.com/file/d/1qDLmcseZhSnTX_KEHUEcbgRdrX5H9qdt/view?usp=sharing" },
+            { cardTitle: "Macroinvertebrados Andinos", cardSubtitle: "Impactos de la actividad humana.", imageUrl: "https://dn721901.ca.archive.org/0/items/canal_centroamericano/macroinvertebrados_andinos%202.jpeg", audioEs: "https://ia600903.us.archive.org/16/items/sp-macroinvertebrados-andinos-impacto-de-mineria-y-agricultura/Sp_Macroinvertebrados%20Andinos_%20Impacto%20de%20Mineri%CC%81a%20y%20Agricultura.mp3", audioEn: "https://ia601203.us.archive.org/7/items/en-macroinvertebrados-andinos-impacto-de-mineria-y-agricultura/En_Macroinvertebrados%20Andinos_%20Impacto%20de%20Mineri%CC%81a%20y%20Agricultura.mp3", titleEs: "Macroinvertebrados de arroyos andinos: impactos de la actividad humana", descriptionEs: "Este estudio evalúa el impacto de la minería, la agricultura y la ganadería en los macroinvertebrados acuáticos en arroyos andinos colombianos. Contrario a la hipótesis inicial, las actividades agrícolas tuvieron el impacto más significativo, reduciendo la densidad y diversidad. El estudio subraya la importancia de la vegetación ribereña para la salud de estos ecosistemas.", authorsEs: "Ana M. Meza-Salazar, Giovany Guevara, and Carlos A. Cultid-Medina", authorUcaldasEs: "Lucimar Gomes-Dias", articleLink: "https://peerj.com/articles/9619/#table-1" },
+            { cardTitle: "Emociones Musicales y EEG", cardSubtitle: "Generación MIDI desde el cerebro.", imageUrl: "https://dn721901.ca.archive.org/0/items/canal_centroamericano/Emociones%20Musicales%20y%20EEG%202.jpeg", audioEs: "https://ia600902.us.archive.org/35/items/sp-1-prediccion-de-emociones-musicales-basada-en-eeg-usando-extraccion-supervisa/Sp_1Prediccio%CC%81n%20de%20emociones%20musicales%20basada%20en%20EEG%20usando%20extraccio%CC%81n%20supervisada%20de%20caracteri%CC%81sticas%20para%20generacio%CC%81n%20MIDI.mp3", audioEn: "https://ia600407.us.archive.org/33/items/en-sp-prediccion-de-emociones-musicales-basada-en-eeg-usando-extraccion-supervis/En_Sp_Prediccio%CC%81n%20de%20emociones%20musicales%20basada%20en%20EEG%20usando%20extraccio%CC%81n%20supervisada%20de%20caracteri%CC%81sticas%20para%20generacio%CC%81n%20MIDI.mp3", titleEs: "Predicción de emociones musicales basada en EEG para generación MIDI", descriptionEs: "Este estudio presenta un marco de aprendizaje profundo que predice emociones a partir de señales EEG para generar música MIDI. El modelo alinea características de la actividad cerebral y datos auditivos, logrando reconstruir secuencias MIDI que preservan su estructura musical, buscando integrar interfaces cerebro-computadora con la generación de música.", authorsEs: "Oscar Gomez-Morales, Hernan Perez-Nastar, Andrés Marino Álvarez-Meza, and Germán Castellanos-Dominguez", authorUcaldasEs: "Héctor Torres-Cardona", articleLink: "https://www.mdpi.com/1424-8220/25/5/1471" },
+            { cardTitle: "Música Callejera en España", cardSubtitle: "Una carrera de obstáculos.", imageUrl: "https://dn721901.ca.archive.org/0/items/canal_centroamericano/Mu%CC%81sica%20Callejera%20en%20Espan%CC%83a.jpeg", audioEs: "https://ia601302.us.archive.org/10/items/sp-musicos-callejeros-en-espana-regulacion-injusta/Sp_Mu%CC%81sicos%20Callejeros%20en%20Espan%CC%83a_%20Regulacio%CC%81n%20Injusta.mp3", audioEn: "https://ia600901.us.archive.org/0/items/en-musicos-callejeros-en-espana-regulacion-injusta/En_Mu%CC%81sicos%20Callejeros%20en%20Espan%CC%83a_%20Regulacio%CC%81n%20Injusta.mp3", titleEs: "Regulación de la música callejera en España: una carrera de obstáculos", descriptionEs: "Este estudio investiga los desafíos que enfrentan los músicos callejeros en España debido a regulaciones municipales injustas. La investigación examina cómo la prohibición de amplificación y otras restricciones impactan negativamente sus ingresos, concluyendo que las regulaciones obstaculizan su desarrollo profesional.", authorsEs: "Crismary Ospina Gallego, María Nuria Lloret Romero", authorUcaldasEs: "Héctor Yovanny Betancur Santa", articleLink: "https://drive.google.com/file/d/13-bQxyCGOurru3E_GvdPNIww07yC5TvK/view?usp=sharing" },
+            { cardTitle: "Cáncer de Próstata y IA", cardSubtitle: "Segmentación con Transfer Learning.", imageUrl: "https://dn721901.ca.archive.org/0/items/canal_centroamericano/Ca%CC%81ncer%20de%20Pro%CC%81stata%20y%20IA.jpeg", audioEs: "https://ia600704.us.archive.org/25/items/sp-sam-unetr-segmentacion-de-cancer-de-prostata-mediante-transfer-learning/Sp_SAM-UNETR_%20Segmentacio%CC%81n%20de%20Ca%CC%81ncer%20de%20Pro%CC%81stata%20Mediante%20Transfer%20Learning.mp3", audioEn: "https://ia601203.us.archive.org/27/items/en-sam-unetr-clinically-significant-prostate-cancer-segmentation/En_SAM-UNETR_%20Clinically%20Significant%20Prostate%20Cancer%20Segmentation.mp3", titleEs: "SAM-UNETR: segmentación de cáncer de próstata con IA", descriptionEs: "Este artículo presenta SAM-UNETR, un modelo de aprendizaje profundo para la segmentación de cáncer de próstata a partir de imágenes de resonancia magnética. El estudio destaca su fiabilidad y precisión superiores en la detección, ofreciendo una herramienta valiosa para la detección del cáncer de próstata.", authorsEs: "JESUS ALEJANDRO ALZATE-GRISALES, ALEJANDRO MORA-RUBIO, FRANCISCO GARCÍA-GARCÍA, AND MARIA DE LA IGLESIA-VAYÁ", authorUcaldasEs: "REINEL TABARES-SOTO", articleLink: "https://ieeexplore.ieee.org/abstract/document/10292632" },
+            { cardTitle: "Microbioma Intestinal", cardSubtitle: "Conexión con nutrición y salud.", imageUrl: "https://ia800900.us.archive.org/27/items/canal_centroamericano/Microbioma%20Intestinal%202.jpeg", audioEs: "https://ia600708.us.archive.org/35/items/sp-microbioma-humano-y-salud-un-analisis-cienciometrico/Sp_Microbioma%20Humano%20y%20Salud_%20Un%20Ana%CC%81lisis%20Cienciome%CC%81trico.mp3", audioEn: "https://ia600407.us.archive.org/9/items/en-microbioma-humano-y-salud-un-analisis-cienciometrico/En_Microbioma%20Humano%20y%20Salud_%20Un%20Ana%CC%81lisis%20Cienciome%CC%81trico.mp3", titleEs: "Microbioma intestinal humano: conexión con la salud", descriptionEs: "Este artículo explora el papel del microbioma intestinal como un órgano metabólico que influye en la nutrición y la salud general. La revisión aborda terapias personalizadas dirigidas al microbioma, como probióticos y prebióticos, para enfermedades crónicas, destacando el impacto de las intervenciones dietéticas.", authorsEs: "Martha Zuluaga, María Cristina Florian Pérez, Kevin Fernando Montoya-Quintero, Mariana S. Candamil-Cortés and Sebastian Robledo", authorUcaldasEs: "Sandra Valencia", articleLink: "https://www.mdpi.com/1422-0067/26/9/4112" },
+            { cardTitle: "Reparación de Víctimas", cardSubtitle: "Jurisprudencia de la Corte IDH.", imageUrl: "https://ia600900.us.archive.org/27/items/canal_centroamericano/Reparacio%CC%81n%20de%20Vi%CC%81ctimas%201.jpeg", audioEs: "https://ia600407.us.archive.org/4/items/sp-la-reparacion-integral-un-derecho-humano-progresivo/Sp_La%20Reparacio%CC%81n%20Integral_%20Un%20Derecho%20Humano%20Progresivo.mp3", audioEn: "https://ia600905.us.archive.org/29/items/en-la-reparacion-integral-un-derecho-humano-progresivo/En_La%20Reparacio%CC%81n%20Integral_%20Un%20Derecho%20Humano%20Progresivo.mp3", titleEs: "La reparación de las víctimas y los derechos humanos", descriptionEs: "Este artículo examina la reparación de víctimas como un derecho humano complejo. Se argumenta que la reparación debe ir más allá de lo económico para abordar el perjuicio multidimensional, analizando cómo la Corte Interamericana de Derechos Humanos ha impulsado medidas de reparación integrales.", authorsEs: "", authorUcaldasEs: "Lucero Ríos Tovar", articleLink: "https://revistas.upb.edu.co/index.php/derecho/article/view/3575" }
+        ];
+
+        // --- Función de Inicialización ---
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        function initApp() {
+            // Initialize DOM references
+            dom = {
+                playBtn: document.getElementById('central-play-button'),
+                playIcon: document.getElementById('play-icon'),
+                pauseIcon: document.getElementById('pause-icon'),
+                modalVisualizer: document.getElementById('modal-visualizer'),
+                floatingMetadataModal: document.getElementById('floating-metadata-modal'),
+                floatingMetadataTitle: document.getElementById('floating-metadata-title'),
+                floatingMetadataArtist: document.getElementById('floating-metadata-artist'),
+                volumeUpBtn: document.getElementById('volume-up-button'),
+                volumeDownBtn: document.getElementById('volume-down-button'),
+                volumeFeedbackContainer: document.getElementById('volume-feedback-container'),
+                volumeFeedbackBar: document.getElementById('volume-feedback-bar'),
+                podcastCarousel: document.getElementById('podcast-carousel-content'),
+                podcastModal: document.getElementById('podcast-modal'),
+                modalCloseBtn: document.getElementById('modal-close-button'),
+                modalImg: document.getElementById('modal-podcast-image'),
+                modalTitle: document.getElementById('modal-podcast-title'),
+                modalDesc: document.getElementById('modal-podcast-description'),
+                modalAuthors: document.getElementById('modal-podcast-authors'),
+                modalArticleLink: document.getElementById('modal-article-link'),
+                playEsBtn: document.getElementById('play-es-button'),
+                playEnBtn: document.getElementById('play-en-button'),
+                feedbackToast: document.getElementById('feedback-toast'),
+                playerMainContainer: document.getElementById('player-main-container'),
+                closeSectionButton: document.getElementById('close-section-button'),
+                showsContainer: document.getElementById('shows-container'),
+                podcastActionsContainer: document.getElementById('podcast-actions-container'),
+                streamActionsContainer: document.getElementById('stream-actions-container'),
+                viewInfoIcon: document.getElementById('view-info-icon'),
+                streamInfoIcon: document.getElementById('stream-info-icon'),
+                logoLiveButton: document.getElementById('logo-live-button'),
+                llmInfoModal: document.getElementById('llm-info-modal'),
+                llmModalCloseButton: document.getElementById('llm-modal-close-button'),
+                llmResponseText: document.getElementById('llm-response-text'),
+                llmLoadingSpinner: document.getElementById('llm-loading-spinner'),
+                aiBackgroundContainer: document.getElementById('ai-background-container'),
+            };
+
+            // Initialize state
+            isPlaying = false;
+
+            // Initialize UI state - ensure play icon is visible
+            updatePlayButtonUI();
+
+            // Initialize audio player
+            masterAudio = document.getElementById('master-audio-player');
+            masterAudio.volume = 0.75;
+
+            // Setup the application
+            switchToStream(false);
+            populatePodcastCards();
+            setupEventListeners();
+            updateBackgroundImage();
+        }
+        
+        // --- Lógica de la Interfaz de Usuario (UI) ---
+
+        function showToast(message) {
+            if(dom.feedbackToast) {
+                dom.feedbackToast.textContent = message;
+                dom.feedbackToast.classList.add('show');
+                setTimeout(() => { dom.feedbackToast.classList.remove('show'); }, 3000);
+            }
+        }
+
+        function updatePlayButtonUI() {
+            // Manage play/pause icon visibility
+            if (isPlaying) {
+                // Show pause icon when playing
+                dom.playIcon.classList.add('hidden');
+                dom.pauseIcon.classList.remove('hidden');
+            } else {
+                // Show play icon when not playing
+                dom.playIcon.classList.remove('hidden');
+                dom.pauseIcon.classList.add('hidden');
+            }
+
+            // Update button appearance
+            dom.playBtn.classList.toggle('is-playing', isPlaying);
+            dom.modalVisualizer.classList.toggle('active', isPlaying);
+            dom.playBtn.style.background = isPlaying ? 'radial-gradient(circle, #4ade80, #22c55e)' : 'radial-gradient(circle, #fb923c, #f97316)';
+        }
+
+        function updateFloatingMetadataDisplay({ title, artist }) {
+            dom.floatingMetadataTitle.textContent = title || 'En vivo';
+            dom.floatingMetadataArtist.textContent = artist || '...';
+        }
+
+        // --- Lógica del Reproductor de Audio ---
+
+        function playAudio() {
+            if (!masterAudio.src) switchToStream(true);
+            const playPromise = masterAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.error("Error al reproducir:", e);
+                    isPlaying = false;
+                    updatePlayButtonUI();
+                });
+            }
+        }
+        
+        function pauseAudio() {
+            masterAudio.pause();
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+        }
+        
+        function switchToStream(autoplay = true) {
+            pauseAudio();
+            currentAudioSource = 'stream';
+            currentPodcast = null;
+
+            if (masterAudio.src !== STREAM_URL) {
+                masterAudio.src = STREAM_URL;
+                masterAudio.load();
+            }
+
+            connectToMetadataStream();
+            dom.podcastActionsContainer.classList.add('hidden');
+            dom.streamActionsContainer.classList.remove('hidden');
+            dom.modalVisualizer.classList.remove('hidden');
+
+            if (autoplay) {
+                playAudio();
+            }
+        }
+        
+        function playPodcast(podcast, lang) {
+            closeAll(); 
+            pauseAudio();
+            currentAudioSource = 'podcast'; 
+            currentPodcast = podcast;
+            masterAudio.src = lang === 'es' ? podcast.audioEs : podcast.audioEn;
+            masterAudio.load(); 
+            playAudio();
+            updateFloatingMetadataDisplay({
+                title: lang === 'es' ? podcast.titleEs : podcast.titleEn,
+                artist: podcast.authorUcaldasEs
+            });
+            dom.podcastModal.classList.remove('active');
+            dom.podcastActionsContainer.classList.remove('hidden');
+            dom.streamActionsContainer.classList.add('hidden');
+            dom.modalVisualizer.classList.add('hidden');
+        }
+
+        function changeVolume(amount) {
+            let newVolume = masterAudio.volume + amount;
+            newVolume = Math.max(0, Math.min(1, newVolume)); // Limitar entre 0 y 1
+            masterAudio.volume = newVolume;
+            
+            if (volumeFeedbackTimeout) clearTimeout(volumeFeedbackTimeout);
+            dom.volumeFeedbackBar.style.height = `${masterAudio.volume * 100}%`;
+            dom.volumeFeedbackContainer.style.opacity = '1';
+            volumeFeedbackTimeout = setTimeout(() => { dom.volumeFeedbackContainer.style.opacity = '0'; }, 1500);
+        }
+
+        // --- Lógica de Navegación y Modales ---
+
+        function closeAll() {
+            document.querySelectorAll(".content-section").forEach(s => s.classList.remove("active"));
+            dom.showsContainer.classList.remove("visible");
+            dom.playerMainContainer.style.opacity = "1";
+            dom.playerMainContainer.style.pointerEvents = "auto";
+            activeSectionId = null;
+            dom.closeSectionButton.classList.add("hidden");
+        }
+        
+        function showSection(sectionName) {
+            const sectionId = sectionName + "-section";
+            const isCurrentlyActive = activeSectionId === sectionId;
+            closeAll(); 
+        
+            if (!isCurrentlyActive) {
+                const sectionElement = document.getElementById(sectionId);
+                sectionElement.classList.add("active");
+                activeSectionId = sectionId;
+                dom.closeSectionButton.classList.remove("hidden");
+                dom.playerMainContainer.style.opacity = "0";
+                dom.playerMainContainer.style.pointerEvents = "none";
+            }
+        }
+        
+        function toggleShows() {
+            const isVisible = dom.showsContainer.classList.contains("visible");
+            closeAll();
+            if (!isVisible) {
+                dom.showsContainer.classList.add("visible");
+            }
+        }
+
+        function openPodcastModal(podcast) {
+            currentPodcast = podcast; 
+            dom.modalTitle.textContent = podcast.titleEs;
+            const cardImg = document.querySelector(`.podcast-card[data-index='${podcastData.indexOf(podcast)}'] img`);
+            dom.modalImg.src = cardImg ? cardImg.src : 'https://placehold.co/300x128/2d3748/fb923c?text=Podcast';
+            dom.modalDesc.textContent = podcast.descriptionEs;
+            dom.modalAuthors.innerHTML = `<span class="font-bold text-orange-400">★ ${podcast.authorUcaldasEs}</span>, ${podcast.authorsEs}`;
+            dom.modalArticleLink.href = podcast.articleLink;
+            dom.podcastModal.classList.add('active');
+        }
+
+        // --- Lógica de IA y Contenido Dinámico ---
+
+        function connectToMetadataStream() {
+            if (metadataEventSource) metadataEventSource.close();
+            metadataEventSource = new EventSource(METADATA_API_URL);
+            dom.floatingMetadataModal.classList.add('visible');
+            metadataEventSource.onmessage = function(event) {
+                if(currentAudioSource !== 'stream') return;
+                try {
+                    const data = JSON.parse(event.data);
+                    const streamTitle = data.streamTitle || '';
+                    const parts = streamTitle.split(' - ');
+                    const artist = parts.length > 1 ? parts.shift().trim() : 'Radio Divergentes';
+                    const title = parts.join(' - ').trim() || streamTitle;
+                    updateFloatingMetadataDisplay({ title, artist });
+                } catch (e) { 
+                    updateFloatingMetadataDisplay({ title: event.data, artist: 'Radio Divergentes' });
+                }
+            };
+        }
+
+        async function handleLlmInfoRequest() {
+            const title = dom.floatingMetadataTitle.textContent;
+            dom.llmResponseText.innerHTML = '';
+            dom.llmLoadingSpinner.classList.remove('hidden');
+            dom.llmInfoModal.classList.add('active');
+
+            let prompt;
+
+            if (title.toLowerCase().includes('cap ')) {
+                prompt = `Estás escuchando un capítulo de Divergentes Podcast, una producción del Centro de Ciencia Francisco José de Caldas de la Universidad de Caldas, conducido por Juana Valentina Bustos, comunicadora de la ciencia.`;
+                dom.llmResponseText.innerText = prompt;
+                dom.llmLoadingSpinner.classList.add('hidden');
+                return;
+            } else if (title === 'En vivo' || dom.floatingMetadataArtist.textContent === 'Radio Divergentes' || !title) {
+                showToast("No hay información de la canción actual.");
+                dom.llmInfoModal.classList.remove('active');
+                return;
+            } else {
+                prompt = `Actúa como un locutor de radio experto y apasionado llamado 'El Divergente'. Cuenta una historia o dato curioso y **divergente** sobre la pieza musical '${title}' del artista '${dom.floatingMetadataArtist.textContent}'. Por 'divergente' me refiero a una conexión inesperada, una perspectiva inusual, o un contraste sorprendente con otra obra o idea, incluso si la pieza no es muy conocida. Sé breve, amigable, usa un lenguaje cercano y utiliza un estilo de storytelling. No incluyas saludos ni despedidas, ve directo al dato.`;
+            }
+
+            try {
+                const response = await fetch('/api/get-song-info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                dom.llmResponseText.innerHTML = data.response || 'No se pudo obtener información sobre esta canción.';
+            } catch (error) {
+                console.error('Error al obtener información de la canción:', error);
+                dom.llmResponseText.innerHTML = 'Error al conectar con el servicio de información. Inténtalo de nuevo más tarde.';
+            } finally {
+                dom.llmLoadingSpinner.classList.add('hidden');
+            }
+        }
+        
+        async function updateBackgroundImage() {
+            console.log("Iniciando la carga de la imagen de fondo...");
+            const functionUrl = "/api/generate-image";
+
+            try {
+                const response = await fetch(functionUrl);
+                if (!response.ok) {
+                    throw new Error(`La función de fondo falló con estado: ${response.status}`);
+                }
+                const imageBlob = await response.blob();
+                const imageUrl = URL.createObjectURL(imageBlob);
+                dom.aiBackgroundContainer.style.backgroundImage = `url(${imageUrl})`;
+                dom.aiBackgroundContainer.style.opacity = 1;
+                console.log("Fondo de pantalla dinámico cargado exitosamente.");
+            } catch (error) {
+                console.error("No se pudo cargar el fondo dinámico:", error);
+            }
+        }
+
+        function populatePodcastCards(){
+            if(dom.podcastCarousel){
+                dom.podcastCarousel.innerHTML = "";
+                podcastData.forEach((podcast, index) => {
+                    const card = document.createElement("div");
+                    card.className = "podcast-card bg-gray-700 rounded-lg shadow-lg overflow-hidden cursor-pointer p-3 text-center hover:bg-gray-600 transition-colors duration-300 flex-none w-48 sm:w-64";
+                    card.dataset.index = index;
+                    card.innerHTML = `
+                        <div class="podcast-image-container bg-gray-800 rounded-md">
+                            <img src="${podcast.imageUrl}" alt="${podcast.cardTitle}" class="w-full h-full object-cover rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/300x128/2d3748/fb923c?text=Podcast';">
+                        </div>
+                        <h3 class="font-semibold text-sm sm:text-lg mb-1 mt-2 truncate">${podcast.cardTitle}</h3>
+                        <p class="text-xs sm:text-sm text-gray-400">${podcast.cardSubtitle}</p>`;
+                    dom.podcastCarousel.appendChild(card);
+                });
+            }
+        }
+        
+        // --- Configuración de Event Listeners ---
+        function setupEventListeners(){
+            dom.playBtn.addEventListener("click", togglePlayPause);
+            dom.volumeUpBtn.addEventListener("click", () => changeVolume(0.1));
+            dom.volumeDownBtn.addEventListener("click", () => changeVolume(-0.1));
+            
+            masterAudio.addEventListener("ended", () => { if(currentAudioSource === 'podcast') { pauseAudio(); switchToStream(false); } });
+            masterAudio.addEventListener('playing', () => { isPlaying = true; updatePlayButtonUI(); });
+            masterAudio.addEventListener('pause', () => { isPlaying = false; updatePlayButtonUI(); });
+            masterAudio.addEventListener('error', () => { updatePlayButtonUI(); });
+            
+            dom.podcastCarousel.addEventListener("click", e => {
+                const card = e.target.closest(".podcast-card");
+                if (card) {
+                    const podcastIndex = parseInt(card.dataset.index, 10);
+                    openPodcastModal(podcastData[podcastIndex]);
+                }
+            });
+            
+            dom.playEsBtn.addEventListener("click", () => { if(currentPodcast) playPodcast(currentPodcast, "es"); });
+            dom.playEnBtn.addEventListener("click", () => { if(currentPodcast) playPodcast(currentPodcast, "en"); });
+            
+            const closeModal = () => dom.podcastModal.classList.remove("active");
+            dom.modalCloseBtn.addEventListener("click", closeModal);
+            dom.podcastModal.addEventListener("click", e => { if(e.target === dom.podcastModal) closeModal(); });
+            
+            dom.viewInfoIcon.addEventListener('click', () => {
+                if (currentAudioSource === 'podcast' && currentPodcast) {
+                    openPodcastModal(currentPodcast);
+                } else {
+                    handleLlmInfoRequest();
+                }
+            });
+
+            dom.streamInfoIcon.addEventListener('click', () => {
+                handleLlmInfoRequest();
+            });
+            
+            dom.logoLiveButton.addEventListener('click', () => switchToStream(true));
+
+            const closeLlmModal = () => dom.llmInfoModal.classList.remove("active");
+            dom.llmModalCloseButton.addEventListener("click", closeLlmModal);
+            dom.llmInfoModal.addEventListener("click", e => { if(e.target === dom.llmInfoModal) closeLlmModal(); });
+
+            document.getElementById("carousel-arrow-left").addEventListener("click", () => { dom.podcastCarousel.scrollLeft -= dom.podcastCarousel.offsetWidth; });
+            document.getElementById("carousel-arrow-right").addEventListener("click", () => { dom.podcastCarousel.scrollLeft += dom.podcastCarousel.offsetWidth; });
+            
+            document.getElementById('share-button').addEventListener('click', () => {
+                const urlToCopy = window.location.href || 'https://divergentes-webapp-radio.vercel.app/'; // URL por defecto
+                navigator.clipboard.writeText(urlToCopy).then(() => {
+                    showToast('¡Enlace copiado al portapapeles!');
+                }, () => {
+                    showToast('No se pudo copiar el enlace.');
+                });
+            });
+        }
+    </script>
+</body>
+</html>
