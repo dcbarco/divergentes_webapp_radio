@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <style>
+      .radio-body { fill: #fb923c; }
+      .radio-speaker { fill: #1f2937; }
+      .radio-antenna { stroke: #fb923c; stroke-width: 2; fill: none; }
+      .radio-waves { stroke: #fb923c; stroke-width: 1; fill: none; opacity: 0.7; }
+    </style>
+  </defs>
+
+  <!-- Radio Body -->
+  <rect x="4" y="12" width="24" height="16" rx="3" class="radio-body"/>
+
+  <!-- Speaker Grill -->
+  <rect x="8" y="16" width="16" height="8" rx="1" class="radio-speaker"/>
+  <line x1="10" y1="18" x2="22" y2="18" stroke="#666" stroke-width="0.5"/>
+  <line x1="10" y1="20" x2="22" y2="20" stroke="#666" stroke-width="0.5"/>
+  <line x1="10" y1="22" x2="22" y2="22" stroke="#666" stroke-width="0.5"/>
+
+  <!-- Antenna -->
+  <line x1="16" y1="12" x2="16" y2="6" class="radio-antenna"/>
+
+  <!-- Radio Waves -->
+  <path d="M16 4 Q12 2 16 0" class="radio-waves"/>
+  <path d="M16 3 Q11 1 16 -1" class="radio-waves"/>
+  <path d="M16 2 Q10 0 16 -2" class="radio-waves"/>
+
+  <!-- Tuning Knob -->
+  <circle cx="12" cy="20" r="2" fill="#374151"/>
+  <circle cx="12" cy="20" r="1" fill="#6b7280"/>
+
+  <!-- Volume Knob -->
+  <circle cx="20" cy="20" r="2" fill="#374151"/>
+  <circle cx="20" cy="20" r="1" fill="#6b7280"/>
+</svg>
