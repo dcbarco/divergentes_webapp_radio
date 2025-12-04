@@ -186,6 +186,7 @@ Este proyecto está bajo la Licencia ISC. Ver el archivo `LICENSE` para más det
 ## 🙏 Agradecimientos
 
 - **Centro de Ciencia Francisco José de Caldas** - Por la creación de Divergentes Radio
+- **Vicerrectoría de Investigaciones y postgrados UCaldas** - Por el apoyo con los recursos para la creación de Divergentes Radio
 - **Google Gemini AI** - Por la tecnología de IA generativa
 - **Zeno.fm** - Por el servicio de streaming
 - **TailwindCSS** - Por el framework de estilos
@@ -193,12 +194,12 @@ Este proyecto está bajo la Licencia ISC. Ver el archivo `LICENSE` para más det
 ## 📞 Contacto
 
 **Centro de Ciencia Francisco José de Caldas**
-- Website: [www.ciencia.ucaldas.edu.co](https://www.ciencia.ucaldas.edu.co)
-- Email: ciencia@ucaldas.edu.co
+- Website: (https://ccfjc-portafolio.vercel.app/)
+- Email: centrodeciencia@ucaldas.edu.co
 
 ---
 
 <div align="center">
   <p><strong>🎵 ¡Sintoniza la ciencia, siente la música! 🎵</strong></p>
-  <p>Desarrollado con ❤️ por la comunidad científica</p>
+  <p>Desarrollado con ❤️ por y para la comunidad científica</p>
 </div>
