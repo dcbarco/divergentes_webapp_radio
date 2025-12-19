@@ -5,6 +5,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Divergentes</title>
     
+    <!-- Chat Simple embed activo -->
+    <script>
+    (function () {
+      function injectChat() {
+        const chatUrl = 'https://chat-simple.vercel.app/?embed=1'; // ajusta dominio real si aplica
+        if (document.getElementById('chat-simple-embed-container')) return;
+
+        const container = document.createElement('div');
+        container.id = 'chat-simple-embed-container';
+        Object.assign(container.style, {
+          position: 'fixed',
+          bottom: '120px',
+          width: '420px',
+          maxWidth: '95vw',
+          height: '520px',
+          maxHeight: '85vh',
+          minHeight: '320px',
+          zIndex: '9999',
+          transition: 'transform 0.25s ease, opacity 0.25s ease',
+          resize: 'vertical',
+          overflow: 'hidden',
+        });
+
+        const handle = document.createElement('div');
+        Object.assign(handle.style, {
+          position: 'absolute',
+          top: '-8px',
+          left: '0',
+          right: '0',
+          height: '12px',
+          cursor: 'move',
+          zIndex: '10000',
+        });
+        container.appendChild(handle);
+
+        const iframe = document.createElement('iframe');
+        iframe.id = 'chat-simple-embed';
+        iframe.src = chatUrl;
+        iframe.allow = 'clipboard-write';
+        Object.assign(iframe.style, {
+          width: '100%',
+          height: '100%',
+          border: '0',
+          borderRadius: '20px',
+          boxShadow: '0 20px 60px rgba(0,0,0,.45)',
+          background: 'rgba(255,255,255,0.9)', // fondo claro para mayor legibilidad
+        });
+        container.appendChild(iframe);
+
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+        let isVisible = true;
+
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          const deltaX = e.clientX - startX;
+          const deltaY = e.clientY - startY;
+          container.style.left = `${startLeft + deltaX}px`;
+          container.style.top = `${startTop + deltaY}px`;
+        }
+
+        function onMouseUp() {
+          if (!isDragging) return;
+          isDragging = false;
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        handle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          const rect = container.getBoundingClientRect();
+          startLeft = rect.left;
+          startTop = rect.top;
+          startX = e.clientX;
+          startY = e.clientY;
+          container.style.left = `${startLeft}px`;
+          container.style.top = `${startTop}px`;
+          container.style.right = '';
+          container.style.bottom = '';
+          isDragging = true;
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+
+        document.body.appendChild(container);
+
+        // Botón flotante para mostrar/ocultar
+        const toggleBtn = document.createElement('button');
+        toggleBtn.id = 'chat-simple-toggle-btn';
+        toggleBtn.textContent = 'Chat';
+        Object.assign(toggleBtn.style, {
+          position: 'fixed',
+          padding: '12px 18px',
+          borderRadius: '999px',
+          border: 'none',
+          background: 'radial-gradient(circle, #fb923c, #f97316)',
+          color: '#0f172a',
+          fontWeight: '700',
+          cursor: 'pointer',
+          boxShadow: '0 12px 30px rgba(0,0,0,.35)',
+          zIndex: '10000',
+        });
+        document.body.appendChild(toggleBtn);
+
+        const mobileQuery = window.matchMedia('(max-width: 640px)');
+
+        function applyContainerPosition() {
+          if (mobileQuery.matches) {
+            container.style.left = '50%';
+            container.style.right = '';
+            container.style.height = '80vh';
+            container.style.maxHeight = '80vh';
+          } else {
+            container.style.left = '';
+            container.style.right = '20px';
+            container.style.height = '85vh';
+            container.style.maxHeight = '85vh';
+          }
+          updateTransform();
+        }
+
+        const applyTogglePosition = () => {
+          toggleBtn.style.bottom = mobileQuery.matches ? '70px' : '20px';
+          toggleBtn.style.right = '20px';
+        };
+        applyTogglePosition();
+        if (mobileQuery.addEventListener) {
+          mobileQuery.addEventListener('change', applyTogglePosition);
+          mobileQuery.addEventListener('change', applyContainerPosition);
+        } else if (mobileQuery.addListener) {
+          mobileQuery.addListener(applyTogglePosition);
+          mobileQuery.addListener(applyContainerPosition);
+        }
+
+        function updateVisibility(show) {
+          isVisible = show;
+          updateTransform();
+          container.style.opacity = show ? '1' : '0';
+          container.style.pointerEvents = show ? 'auto' : 'none';
+          toggleBtn.textContent = show ? 'Cerrar chat' : 'Abrir chat';
+        }
+
+        function updateTransform() {
+          if (mobileQuery.matches) {
+            container.style.transform = isVisible ? 'translate(-50%, 0)' : 'translate(-50%, 120%)';
+          } else {
+            container.style.transform = isVisible ? 'translateY(0)' : 'translateY(120%)';
+          }
+        }
+
+        toggleBtn.addEventListener('click', () => updateVisibility(!isVisible));
+
+        window.chatSimpleToggle = function (show = true) {
+          updateVisibility(show);
+        };
+
+        updateVisibility(true);
+        applyContainerPosition();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectChat);
+      } else {
+        injectChat();
+      }
+    })();
+    </script>
+
+    <!-- Snippet de embed flotante para usar en otros sitios: reemplaza el dominio en chatUrl.
+         En modo embed el botÇün interno no se muestra; el host puede mostrar/ocultar el iframe con display/transform. -->
+    <!--
+    <script>
+    (function () {
+      const chatUrl = 'https://tu-dominio/chat-simple/?embed=1'; // ajusta dominio real, p.ej. https://chat-simple.vercel.app/?embed=1
+      if (document.getElementById('chat-simple-embed')) return;
+      const iframe = document.createElement('iframe');
+      iframe.id = 'chat-simple-embed';
+      iframe.src = chatUrl;
+      iframe.allow = 'clipboard-write';
+      Object.assign(iframe.style, {
+        position: 'fixed',
+        bottom: '90px',
+        right: '20px',
+        width: '420px',
+        maxWidth: '95vw',
+        height: '520px',
+        maxHeight: '80vh',
+        border: '0',
+        borderRadius: '20px',
+        boxShadow: '0 20px 60px rgba(0,0,0,.45)',
+        background: 'transparent',
+        zIndex: '9999',
+        transition: 'transform 0.25s ease, opacity 0.25s ease',
+      });
+      document.body.appendChild(iframe);
+
+      window.chatSimpleToggle = function (show = true) {
+        iframe.style.transform = show ? 'translateY(0)' : 'translateY(120%)';
+        iframe.style.opacity = show ? '1' : '0';
+        iframe.style.pointerEvents = show ? 'auto' : 'none';
+      };
+
+      window.chatSimpleToggle(true);
+    })();
+    </script>
+    -->
+
     <script>
         function setDailyBackground() {
             const images = [
@@ -1016,7 +1223,7 @@
         }
     </script>
 
-    <script id="chatBroEmbedCode">
+    <!-- <script id="chatBroEmbedCode">
     /* Chatbro Widget Embed Code Start */
     function ChatbroLoader(chats,async){
         async=!1!==async;
@@ -1036,6 +1243,6 @@
     }
     /* Chatbro Widget Embed Code End */
     ChatbroLoader({encodedChatId: '797qa', minimized: true, position: 'absolute', offsetY: -250});
-    </script>
+    </script> -->
 </body>
 </html>

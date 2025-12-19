@@ -5,3 +5,7 @@
 .env
 .env.local
 .vercel
+
+# macOS
+.DS_Store
+**/.DS_Store
