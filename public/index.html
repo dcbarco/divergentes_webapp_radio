@@ -1,176 +1,181 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Divergentes</title>
-    
+
     <!-- Chat Simple embed activo -->
     <script>
-    (function () {
-      function injectChat() {
-        const chatUrl = 'https://chat-simple.vercel.app/?embed=1'; // ajusta dominio real si aplica
-        if (document.getElementById('chat-simple-embed-container')) return;
+        (function () {
+            function injectChat() {
+                const chatUrl = 'https://chat-simple.vercel.app/?embed=1'; // ajusta dominio real si aplica
+                if (document.getElementById('chat-simple-embed-container')) return;
 
-        const container = document.createElement('div');
-        container.id = 'chat-simple-embed-container';
-        Object.assign(container.style, {
-          position: 'fixed',
-          bottom: '120px',
-          width: '420px',
-          maxWidth: '95vw',
-          height: '520px',
-          maxHeight: '85vh',
-          minHeight: '320px',
-          zIndex: '9999',
-          transition: 'transform 0.25s ease, opacity 0.25s ease',
-          resize: 'vertical',
-          overflow: 'hidden',
-        });
+                const container = document.createElement('div');
+                container.id = 'chat-simple-embed-container';
+                Object.assign(container.style, {
+                    position: 'fixed',
+                    bottom: '20px',
+                    width: '420px',
+                    maxWidth: '90vw',
+                    height: '600px',
+                    maxHeight: 'calc(100vh - 150px)',
+                    minHeight: '250px',
+                    zIndex: '9999',
+                    transition: 'transform 0.25s ease, opacity 0.25s ease',
+                    resize: 'vertical',
+                    overflow: 'hidden',
+                });
 
-        const handle = document.createElement('div');
-        Object.assign(handle.style, {
-          position: 'absolute',
-          top: '-8px',
-          left: '0',
-          right: '0',
-          height: '12px',
-          cursor: 'move',
-          zIndex: '10000',
-        });
-        container.appendChild(handle);
+                const handle = document.createElement('div');
+                Object.assign(handle.style, {
+                    position: 'absolute',
+                    top: '-8px',
+                    left: '0',
+                    right: '0',
+                    height: '12px',
+                    cursor: 'move',
+                    zIndex: '10000',
+                });
+                container.appendChild(handle);
 
-        const iframe = document.createElement('iframe');
-        iframe.id = 'chat-simple-embed';
-        iframe.src = chatUrl;
-        iframe.allow = 'clipboard-write';
-        Object.assign(iframe.style, {
-          width: '100%',
-          height: '100%',
-          border: '0',
-          borderRadius: '20px',
-          boxShadow: '0 20px 60px rgba(0,0,0,.45)',
-          background: 'rgba(255,255,255,0.9)', // fondo claro para mayor legibilidad
-        });
-        container.appendChild(iframe);
+                const iframe = document.createElement('iframe');
+                iframe.id = 'chat-simple-embed';
+                iframe.src = chatUrl;
+                iframe.allow = 'clipboard-write';
+                Object.assign(iframe.style, {
+                    width: '100%',
+                    height: '100%',
+                    border: '0',
+                    borderRadius: '20px',
+                    boxShadow: '0 20px 60px rgba(0,0,0,.45)',
+                    background: 'rgba(255,255,255,0.9)', // fondo claro para mayor legibilidad
+                });
+                container.appendChild(iframe);
 
-        let isDragging = false;
-        let startX, startY, startLeft, startTop;
-        let isVisible = true;
+                let isDragging = false;
+                let startX, startY, startLeft, startTop;
+                let isVisible = false;
 
-        function onMouseMove(e) {
-          if (!isDragging) return;
-          const deltaX = e.clientX - startX;
-          const deltaY = e.clientY - startY;
-          container.style.left = `${startLeft + deltaX}px`;
-          container.style.top = `${startTop + deltaY}px`;
-        }
+                function onMouseMove(e) {
+                    if (!isDragging) return;
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    container.style.left = `${startLeft + deltaX}px`;
+                    container.style.top = `${startTop + deltaY}px`;
+                }
 
-        function onMouseUp() {
-          if (!isDragging) return;
-          isDragging = false;
-          document.removeEventListener('mousemove', onMouseMove);
-          document.removeEventListener('mouseup', onMouseUp);
-        }
+                function onMouseUp() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
 
-        handle.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          const rect = container.getBoundingClientRect();
-          startLeft = rect.left;
-          startTop = rect.top;
-          startX = e.clientX;
-          startY = e.clientY;
-          container.style.left = `${startLeft}px`;
-          container.style.top = `${startTop}px`;
-          container.style.right = '';
-          container.style.bottom = '';
-          isDragging = true;
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
-        });
+                handle.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    const rect = container.getBoundingClientRect();
+                    startLeft = rect.left;
+                    startTop = rect.top;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    container.style.left = `${startLeft}px`;
+                    container.style.top = `${startTop}px`;
+                    container.style.right = '';
+                    container.style.bottom = '';
+                    isDragging = true;
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
 
-        document.body.appendChild(container);
+                document.body.appendChild(container);
 
-        // Botón flotante para mostrar/ocultar
-        const toggleBtn = document.createElement('button');
-        toggleBtn.id = 'chat-simple-toggle-btn';
-        toggleBtn.textContent = 'Chat';
-        Object.assign(toggleBtn.style, {
-          position: 'fixed',
-          padding: '12px 18px',
-          borderRadius: '999px',
-          border: 'none',
-          background: 'radial-gradient(circle, #fb923c, #f97316)',
-          color: '#0f172a',
-          fontWeight: '700',
-          cursor: 'pointer',
-          boxShadow: '0 12px 30px rgba(0,0,0,.35)',
-          zIndex: '10000',
-        });
-        document.body.appendChild(toggleBtn);
+                // Botón flotante para mostrar/ocultar
+                const toggleBtn = document.createElement('button');
+                toggleBtn.id = 'chat-simple-toggle-btn';
+                toggleBtn.textContent = 'Chat';
+                Object.assign(toggleBtn.style, {
+                    position: 'fixed',
+                    padding: '12px 18px',
+                    borderRadius: '999px',
+                    border: 'none',
+                    background: 'radial-gradient(circle, #fb923c, #f97316)',
+                    color: '#0f172a',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 12px 30px rgba(0,0,0,.35)',
+                    zIndex: '10000',
+                });
+                document.body.appendChild(toggleBtn);
 
-        const mobileQuery = window.matchMedia('(max-width: 640px)');
+                const mobileQuery = window.matchMedia('(max-width: 640px)');
 
-        function applyContainerPosition() {
-          if (mobileQuery.matches) {
-            container.style.left = '50%';
-            container.style.right = '';
-            container.style.height = '80vh';
-            container.style.maxHeight = '80vh';
-          } else {
-            container.style.left = '';
-            container.style.right = '20px';
-            container.style.height = '85vh';
-            container.style.maxHeight = '85vh';
-          }
-          updateTransform();
-        }
+                function applyContainerPosition() {
+                    if (mobileQuery.matches) {
+                        container.style.left = '5px';
+                        container.style.right = '5px';
+                        container.style.width = 'auto';
+                        container.style.bottom = '120px';
+                        container.style.height = 'auto';
+                        container.style.maxHeight = 'calc(100vh - 200px)';
+                    } else {
+                        container.style.left = '';
+                        container.style.right = '20px';
+                        container.style.width = '420px';
+                        container.style.bottom = '90px';
+                        container.style.height = '600px';
+                        container.style.maxHeight = 'calc(100vh - 150px)';
+                    }
+                    updateTransform();
+                }
 
-        const applyTogglePosition = () => {
-          toggleBtn.style.bottom = mobileQuery.matches ? '70px' : '20px';
-          toggleBtn.style.right = '20px';
-        };
-        applyTogglePosition();
-        if (mobileQuery.addEventListener) {
-          mobileQuery.addEventListener('change', applyTogglePosition);
-          mobileQuery.addEventListener('change', applyContainerPosition);
-        } else if (mobileQuery.addListener) {
-          mobileQuery.addListener(applyTogglePosition);
-          mobileQuery.addListener(applyContainerPosition);
-        }
+                const applyTogglePosition = () => {
+                    toggleBtn.style.bottom = mobileQuery.matches ? '70px' : '20px';
+                    toggleBtn.style.right = '20px';
+                };
+                applyTogglePosition();
+                if (mobileQuery.addEventListener) {
+                    mobileQuery.addEventListener('change', applyTogglePosition);
+                    mobileQuery.addEventListener('change', applyContainerPosition);
+                } else if (mobileQuery.addListener) {
+                    mobileQuery.addListener(applyTogglePosition);
+                    mobileQuery.addListener(applyContainerPosition);
+                }
 
-        function updateVisibility(show) {
-          isVisible = show;
-          updateTransform();
-          container.style.opacity = show ? '1' : '0';
-          container.style.pointerEvents = show ? 'auto' : 'none';
-          toggleBtn.textContent = show ? 'Cerrar chat' : 'Abrir chat';
-        }
+                function updateVisibility(show) {
+                    isVisible = show;
+                    updateTransform();
+                    container.style.opacity = show ? '1' : '0';
+                    container.style.pointerEvents = show ? 'auto' : 'none';
+                    toggleBtn.textContent = show ? 'Cerrar chat' : 'Abrir chat';
+                }
 
-        function updateTransform() {
-          if (mobileQuery.matches) {
-            container.style.transform = isVisible ? 'translate(-50%, 0)' : 'translate(-50%, 120%)';
-          } else {
-            container.style.transform = isVisible ? 'translateY(0)' : 'translateY(120%)';
-          }
-        }
+                function updateTransform() {
+                    if (mobileQuery.matches) {
+                        container.style.transform = isVisible ? 'translateY(0)' : 'translateY(150%)';
+                    } else {
+                        container.style.transform = isVisible ? 'translateY(0)' : 'translateY(150%)';
+                    }
+                }
 
-        toggleBtn.addEventListener('click', () => updateVisibility(!isVisible));
+                toggleBtn.addEventListener('click', () => updateVisibility(!isVisible));
 
-        window.chatSimpleToggle = function (show = true) {
-          updateVisibility(show);
-        };
+                window.chatSimpleToggle = function (show = true) {
+                    updateVisibility(show);
+                };
 
-        updateVisibility(true);
-        applyContainerPosition();
-      }
+                updateVisibility(false);
+                applyContainerPosition();
+            }
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', injectChat);
-      } else {
-        injectChat();
-      }
-    })();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', injectChat);
+            } else {
+                injectChat();
+            }
+        })();
     </script>
 
     <!-- Snippet de embed flotante para usar en otros sitios: reemplaza el dominio en chatUrl.
@@ -233,7 +238,7 @@
 
             // Create a new image to preload it
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
                 backgroundContainer.style.backgroundImage = `url('${imageUrl}')`;
                 backgroundContainer.style.opacity = '1'; // Make it visible
             };
@@ -245,12 +250,14 @@
     <!-- Favicon y Meta Tags -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="description" content="Radio Divergentes - WebApp con IA integrada para streaming y podcasts científicos">
+    <meta name="description"
+        content="Radio Divergentes - WebApp con IA integrada para streaming y podcasts científicos">
     <meta name="keywords" content="radio, streaming, podcast, ciencia, tecnologia, IA, Gemini">
 
     <!-- Librerías Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- TODO EL CSS PERSONALIZADO VA AQUÍ, DENTRO DEL HTML -->
     <style>
@@ -261,27 +268,49 @@
             overflow-x: hidden;
             background-color: #1a202c;
         }
+
         #background-container {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: linear-gradient(-45deg, #4c1d95, #1e293b, #0f172a, #9333ea);
             background-size: 400% 400%;
             animation: gradient-animation 15s ease infinite;
             z-index: -2;
         }
+
         @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
+
         #ai-background-container {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-size: cover; background-position: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
             z-index: -1;
             opacity: 0;
             transition: opacity 1.5s ease-in-out;
         }
+
         .backdrop-blur-custom {
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         /* Ensure hidden class works properly */
@@ -291,10 +320,20 @@
 
         /* --- Contenedores Principales --- */
         .player-controls-container {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
         }
-        .content-section { display: none; }
-        .content-section.active { display: block; }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
 
         #player-main-container {
             position: fixed;
@@ -317,12 +356,14 @@
             gap: 1.5rem;
             position: relative;
         }
+
         #central-play-button-container {
             position: relative;
         }
+
         #central-play-button-bg {
             position: absolute;
-            width: 9.5rem; 
+            width: 9.5rem;
             height: 9.5rem;
             top: 50%;
             left: 50%;
@@ -334,21 +375,36 @@
             box-shadow: 0 4px 40px rgba(0, 0, 0, 0.7);
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
+
         #central-play-button {
             position: relative;
-            width: 8rem; height: 8rem;
-            border-radius: 50%; background: radial-gradient(circle, #fb923c, #f97316);
-            box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            width: 8rem;
+            height: 8rem;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fb923c, #f97316);
+            box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
             animation: pulse-glow 4s infinite ease-in-out;
         }
-        #central-play-button:hover { transform: scale(1.05); }
-        #central-play-button:active { transform: scale(0.98); }
-        #central-play-button svg {
-            width: 4rem; height: 4rem;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+
+        #central-play-button:hover {
+            transform: scale(1.05);
         }
+
+        #central-play-button:active {
+            transform: scale(0.98);
+        }
+
+        #central-play-button svg {
+            width: 4rem;
+            height: 4rem;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+        }
+
         #central-play-button.is-playing::after {
             content: '';
             position: absolute;
@@ -359,13 +415,29 @@
             z-index: -1;
             animation: sonar-effect 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
+
         @keyframes sonar-effect {
-            0% { transform: scale(1); opacity: 0.6; }
-            100% { transform: scale(1.4); opacity: 0; }
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
         }
+
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4); }
-            50% { box-shadow: 0 8px 35px rgba(251, 146, 60, 0.6); }
+
+            0%,
+            100% {
+                box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 8px 35px rgba(251, 146, 60, 0.6);
+            }
         }
 
 
@@ -387,15 +459,18 @@
             transition: background-color 0.2s, transform 0.2s;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
+
         .volume-button:hover {
             background-color: rgba(45, 55, 72, 0.7);
         }
+
         .volume-button:active {
             transform: scale(0.95);
         }
+
         #volume-feedback-container {
             position: absolute;
             left: calc(100% + 1rem);
@@ -413,6 +488,7 @@
             transition: opacity 0.3s ease-out;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         #volume-feedback-bar {
             width: 100%;
             height: 75%;
@@ -440,18 +516,23 @@
             visibility: hidden;
             transition: opacity 0.5s ease-out;
         }
+
         #floating-metadata-modal.visible {
             opacity: 1;
             visibility: visible;
         }
-        #floating-metadata-text { 
-            text-align: left; 
+
+        #floating-metadata-text {
+            text-align: left;
             flex-grow: 1;
             min-width: 0;
         }
-        #floating-metadata-title, #floating-metadata-artist {
+
+        #floating-metadata-title,
+        #floating-metadata-artist {
             white-space: normal;
         }
+
         #floating-metadata-title {
             font-size: 0.875rem;
             font-weight: 600;
@@ -459,6 +540,7 @@
             line-height: 1.3;
             margin: 0;
         }
+
         #floating-metadata-artist {
             font-size: 0.75rem;
             font-weight: 200;
@@ -467,12 +549,14 @@
             line-height: 1.3;
             margin: 0;
         }
+
         #modal-visualizer {
             display: flex;
             align-items: flex-end;
             gap: 2px;
             height: 20px;
         }
+
         #modal-visualizer span {
             width: 3px;
             height: 4px;
@@ -480,13 +564,29 @@
             border-radius: 2px;
             transition: height 0.3s ease;
         }
-        #modal-visualizer.active span:nth-child(1) { animation: modal-visualizer-dance 1.2s infinite ease-in-out 0s; }
-        #modal-visualizer.active span:nth-child(2) { animation: modal-visualizer-dance 1.2s infinite ease-in-out 0.2s; }
-        #modal-visualizer.active span:nth-child(3) { animation: modal-visualizer-dance 1.2s infinite ease-in-out 0.4s; }
+
+        #modal-visualizer.active span:nth-child(1) {
+            animation: modal-visualizer-dance 1.2s infinite ease-in-out 0s;
+        }
+
+        #modal-visualizer.active span:nth-child(2) {
+            animation: modal-visualizer-dance 1.2s infinite ease-in-out 0.2s;
+        }
+
+        #modal-visualizer.active span:nth-child(3) {
+            animation: modal-visualizer-dance 1.2s infinite ease-in-out 0.4s;
+        }
 
         @keyframes modal-visualizer-dance {
-            0%, 100% { height: 4px; }
-            50% { height: 20px; }
+
+            0%,
+            100% {
+                height: 4px;
+            }
+
+            50% {
+                height: 20px;
+            }
         }
 
         /* --- Logo y Shows --- */
@@ -495,41 +595,91 @@
             transition: transform 0.2s ease-in-out;
             position: relative;
         }
+
         #logo-live-button:hover {
             transform: scale(1.05);
         }
+
         #live-text {
             animation: live-pulse 2s infinite ease-in-out;
             text-shadow: 0 0 5px #fb923c, 0 0 10px #fb923c;
         }
+
         @keyframes live-pulse {
-            0%, 100% { opacity: 0.75; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.75;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
+
         #shows-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            background-color: rgba(0,0,0,0.5); z-index: 45;
-            opacity: 0; visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 45;
+            opacity: 0;
+            visibility: hidden;
             transition: opacity 0.3s ease, visibility 0s linear 0.3s;
         }
+
         #shows-container.visible {
-            opacity: 1; visibility: visible; transition: opacity 0.3s ease;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
         }
 
         /* --- Modales --- */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8);
-            display: flex; align-items: center; justify-content: center; z-index: 1000; 
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+
         .modal-content {
-            background-color: #2d3748; padding: 1.5rem; border-radius: 0.5rem; width: 90%;
-            max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative;
-            transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: #2d3748;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
-        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
         .modal-close-btn {
             position: absolute;
             top: 0.5rem;
@@ -546,58 +696,123 @@
             border: none;
             transition: transform 0.2s, background-color 0.2s;
         }
+
         .modal-close-btn:hover {
-             transform: scale(1.1);
-             background-color: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+            background-color: rgba(0, 0, 0, 0.7);
         }
 
         /* --- Barra de Navegación Inferior --- */
         .section-nav-button {
-            background-color: transparent; border: none; flex-grow: 1; min-width: 0; padding: 4px;
+            background-color: transparent;
+            border: none;
+            flex-grow: 1;
+            min-width: 0;
+            padding: 4px;
         }
-        .section-nav-button:hover { background-color: rgba(45, 55, 72, 0.5); }
+
+        .section-nav-button:hover {
+            background-color: rgba(45, 55, 72, 0.5);
+        }
 
         /* --- Podcasts --- */
         .podcast-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .podcast-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(251, 146, 60, 0.2), 0 4px 6px -2px rgba(251, 146, 60, 0.1);
         }
-        .podcast-carousel-container { position: relative; }
-        .podcast-carousel { scroll-behavior: smooth; }
-        .podcast-carousel::-webkit-scrollbar { height: 8px; }
-        .podcast-carousel::-webkit-scrollbar-thumb { background-color: #fb923c; border-radius: 10px; }
-        .podcast-carousel::-webkit-scrollbar-track { background-color: #4b5563; border-radius: 10px; }
+
+        .podcast-carousel-container {
+            position: relative;
+        }
+
+        .podcast-carousel {
+            scroll-behavior: smooth;
+        }
+
+        .podcast-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .podcast-carousel::-webkit-scrollbar-thumb {
+            background-color: #fb923c;
+            border-radius: 10px;
+        }
+
+        .podcast-carousel::-webkit-scrollbar-track {
+            background-color: #4b5563;
+            border-radius: 10px;
+        }
+
         .carousel-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(0,0,0,0.6);
-            color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center;
-            justify-content: center; cursor: pointer; z-index: 10; transition: background-color 0.3s ease;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s ease;
         }
-        .carousel-arrow:hover { background-color: rgba(251, 146, 60, 0.8); }
-        .carousel-arrow.left { left: 10px; }
-        .carousel-arrow.right { right: 10px; }
-        .podcast-image-container { position: relative; width: 100%; height: 8rem; }
+
+        .carousel-arrow:hover {
+            background-color: rgba(251, 146, 60, 0.8);
+        }
+
+        .carousel-arrow.left {
+            left: 10px;
+        }
+
+        .carousel-arrow.right {
+            right: 10px;
+        }
+
+        .podcast-image-container {
+            position: relative;
+            width: 100%;
+            height: 8rem;
+        }
+
         .podcast-image-spinner {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #fb923c;
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #fb923c;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
-        #podcast-actions-container, #stream-actions-container {
+
+        #podcast-actions-container,
+        #stream-actions-container {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
+
         .action-icon {
             cursor: pointer;
         }
+
         .action-icon svg {
             width: 1.75rem;
             height: 1.75rem;
             color: #fb923c;
             transition: transform 0.2s, filter 0.2s;
         }
+
         .action-icon:hover svg {
             transform: scale(1.1);
             filter: drop-shadow(0 0 5px #fb923c);
@@ -614,11 +829,12 @@
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             z-index: 1100;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             opacity: 0;
             pointer-events: none;
         }
+
         .feedback-toast.show {
             opacity: 1;
             transform: translate(-50%, -6.5rem);
@@ -628,26 +844,31 @@
         #llm-info-modal .modal-content {
             max-width: 450px;
         }
+
         #llm-modal-content-area {
             position: relative;
             min-height: 4rem;
         }
+
         #llm-response-text {
             font-size: 0.875rem;
             line-height: 1.6;
             margin-top: 1rem;
         }
+
         .ai-disclaimer {
             font-size: 0.7rem;
             opacity: 0.6;
             text-align: center;
             margin-top: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 0.5rem;
             font-weight: 200;
         }
+
         .horizontal-loader {
-            width: 80%; height: 3px;
+            width: 80%;
+            height: 3px;
             background-color: rgba(251, 146, 60, 0.2);
             border-radius: 3px;
             overflow: hidden;
@@ -656,6 +877,7 @@
             left: 10%;
             transform: translateY(-50%);
         }
+
         .horizontal-loader::after {
             content: '';
             width: 40%;
@@ -664,14 +886,21 @@
             position: absolute;
             animation: loader-slide 2s infinite ease-in-out;
         }
+
         @keyframes loader-slide {
-            0% { left: -40%; }
-            100% { left: 100%; }
+            0% {
+                left: -40%;
+            }
+
+            100% {
+                left: 100%;
+            }
         }
+
         /*posicion de icono flotante chatbro*/
         .chatbro_container .chatbro_movable_chat {
-            bottom: 90px!important;
-        }    
+            bottom: 90px !important;
+        }
     </style>
 </head>
 
@@ -679,7 +908,7 @@
     <!-- Contenedores para los fondos -->
     <div id="background-container"></div>
     <div id="ai-background-container"></div>
-    
+
     <!-- Reproductor Principal (Centro de la pantalla) -->
     <main id="player-main-container">
         <div id="player-controls-wrapper">
@@ -687,8 +916,16 @@
             <div id="central-play-button-container">
                 <div id="central-play-button-bg"></div>
                 <div id="central-play-button">
-                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.648c1.295.742 1.295 2.545 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653z" /></svg>
-                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M5.25 6.375a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM5.25 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zM5.25 17.625a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM14.25 6.375a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM14.25 17.625a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75z"></path></svg>
+                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.648c1.295.742 1.295 2.545 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653z" />
+                    </svg>
+                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="hidden">
+                        <path
+                            d="M5.25 6.375a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM5.25 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zM5.25 17.625a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM14.25 6.375a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75zM14.25 17.625a.75.75 0 01.75-.75h3a.75.75 0 010 1.5h-3a.75.75 0 01-.75-.75z">
+                        </path>
+                    </svg>
                 </div>
             </div>
             <button id="volume-up-button" class="volume-button">+</button>
@@ -706,20 +943,24 @@
                 <span></span><span></span><span></span>
             </div>
             <div id="podcast-actions-container" class="hidden">
-                  <div id="view-info-icon" class="action-icon" title="Ver Info Podcast">
+                <div id="view-info-icon" class="action-icon" title="Ver Info Podcast">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clip-rule="evenodd" />
                     </svg>
-                  </div>
+                </div>
             </div>
             <div id="stream-actions-container">
-                  <div id="stream-info-icon" class="action-icon" title="Datos Divergentes">
+                <div id="stream-info-icon" class="action-icon" title="Datos Divergentes">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clip-rule="evenodd" />
                     </svg>
-                  </div>
+                </div>
             </div>
         </div>
     </main>
@@ -727,57 +968,108 @@
     <!-- Logo y Botón de Shows -->
     <div class="absolute top-4 left-4 z-40">
         <div id="logo-live-button" title="Sintoniza la Radio">
-            <img src="https://i.ibb.co/W4zdnRb5/Miniatura.jpg" alt="Logo de Divergentes" class="h-16 w-auto rounded-md shadow-lg" onerror="this.onerror=null;this.src='https://placehold.co/64x64/1a202c/ffffff?text=Logo';">
+            <img src="https://i.ibb.co/W4zdnRb5/Miniatura.jpg" alt="Logo de Divergentes"
+                class="h-16 w-auto rounded-md shadow-lg"
+                onerror="this.onerror=null;this.src='https://placehold.co/64x64/1a202c/ffffff?text=Logo';">
             <p id="live-text" class="text-xs text-center mt-1">Al Aire</p>
         </div>
     </div>
 
     <div id="shows-container">
         <div class="backdrop-blur-custom p-3 sm:p-6 rounded-lg shadow-2xl w-full max-w-md bg-gray-900 bg-opacity-70">
-            <iframe height="300px" width="100%" scrolling="yes" frameborder="0" src="https://rn5zosh0x4ouv.pl.zeno.fm/embed/weekly-program" class="rounded-md"></iframe>
+            <iframe height="300px" width="100%" scrolling="yes" frameborder="0"
+                src="https://rn5zosh0x4ouv.pl.zeno.fm/embed/weekly-program" class="rounded-md"></iframe>
         </div>
     </div>
-    
+
     <!-- Barra de Navegación Inferior y Secciones de Contenido -->
     <div class="player-controls-container bg-gray-900 bg-opacity-80 backdrop-blur-custom shadow-t-2xl">
         <div id="bottom-controls-wrapper" class="relative">
             <div class="flex justify-around items-center p-2 bg-gray-700 bg-opacity-60 border-t border-gray-600">
-                <button onclick="showSection('podcasts')" class="section-nav-button text-white hover:text-orange-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 flex flex-col items-center justify-center">
-                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2-2H4a2 2 0 01-2-2v-4z"></path></svg>
+                <button onclick="showSection('podcasts')"
+                    class="section-nav-button text-white hover:text-orange-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path
+                            d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2-2H4a2 2 0 01-2-2v-4z">
+                        </path>
+                    </svg>
                     <span class="text-xs">Podcasts</span>
                 </button>
-                <button onclick="showSection('descripcion')" class="section-nav-button text-white hover:text-orange-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 flex flex-col items-center justify-center">
-                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                <button onclick="showSection('descripcion')"
+                    class="section-nav-button text-white hover:text-orange-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clip-rule="evenodd"></path>
+                    </svg>
                     <span class="text-xs">Divergentes</span>
                 </button>
-                <button onclick="toggleShows()" class="section-nav-button text-white hover:text-blue-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col items-center justify-center">
-                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                <button onclick="toggleShows()"
+                    class="section-nav-button text-white hover:text-blue-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                            clip-rule="evenodd"></path>
+                    </svg>
                     <span class="text-xs">Shows</span>
                 </button>
-                <button id="share-button" class="section-nav-button text-white hover:text-green-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center justify-center">
-                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"></path></svg>
+                <button id="share-button"
+                    class="section-nav-button text-white hover:text-green-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path
+                            d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z">
+                        </path>
+                    </svg>
                     <span class="text-xs">Compartir</span>
                 </button>
-                <button id="close-section-button" onclick="closeAll()" class="section-nav-button text-red-500 hover:text-red-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 flex flex-col items-center justify-center hidden">
-                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                <button id="close-section-button" onclick="closeAll()"
+                    class="section-nav-button text-red-500 hover:text-red-400 font-normal rounded-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 flex flex-col items-center justify-center hidden">
+                    <svg class="w-6 h-6 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd"></path>
+                    </svg>
                     <span class="text-xs">Cerrar</span>
                 </button>
             </div>
         </div>
-        
+
         <div id="podcasts-section" class="content-section p-4 bg-gray-800 bg-opacity-90 max-h-96 overflow-y-auto">
             <h2 class="text-xl font-bold mb-4 text-center text-orange-400">Investigación científica hecha podcast</h2>
-            <div class="podcast-carousel-container px-4 sm:px-10"> 
-                <div id="carousel-arrow-left" class="carousel-arrow left"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg></div>
+            <div class="podcast-carousel-container px-4 sm:px-10">
+                <div id="carousel-arrow-left" class="carousel-arrow left"><svg xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg></div>
                 <div id="podcast-carousel-content" class="podcast-carousel flex overflow-x-auto space-x-4 pb-4"></div>
-                <div id="carousel-arrow-right" class="carousel-arrow right"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
+                <div id="carousel-arrow-right" class="carousel-arrow right"><svg xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg></div>
             </div>
         </div>
         <div id="descripcion-section" class="content-section p-6 bg-gray-800 bg-opacity-90 max-h-96 overflow-y-auto">
             <h2 class="text-2xl font-bold mb-6 text-center text-orange-400">Sobre Divergentes Radio</h2>
-            <div class="text-center mb-4 px-4"><p class="text-sm leading-relaxed">Divergentes es la emisora online del Centro de Ciencia Francisco José de Caldas, un espacio sonoro que vibra con la ciencia, la tecnología, la sociedad y las múltiples formas de conocimiento. Nace con el propósito de expandir nuestras voces, nuestras preguntas y nuestras apuestas por una comunicación cercana, crítica y diversa. Esta emisora responde a nuestros ejes misionales de comunicación de la ciencia, mediación tecnológica, participación ciudadana y, sobre todo, apropiación social del conocimiento. En Divergentes hay lugar para la música, los podcast, los programas en vivo y todo aquello que nos permita cruzar fronteras entre saberes e ideas.</p></div>
+            <div class="text-center mb-4 px-4">
+                <p class="text-sm leading-relaxed">Divergentes es la emisora online del Centro de Ciencia Francisco José
+                    de Caldas, un espacio sonoro que vibra con la ciencia, la tecnología, la sociedad y las múltiples
+                    formas de conocimiento. Nace con el propósito de expandir nuestras voces, nuestras preguntas y
+                    nuestras apuestas por una comunicación cercana, crítica y diversa. Esta emisora responde a nuestros
+                    ejes misionales de comunicación de la ciencia, mediación tecnológica, participación ciudadana y,
+                    sobre todo, apropiación social del conocimiento. En Divergentes hay lugar para la música, los
+                    podcast, los programas en vivo y todo aquello que nos permita cruzar fronteras entre saberes e
+                    ideas.</p>
+            </div>
             <h3 class="text-xl font-semibold mb-4 text-center text-orange-300">Gracias a:</h3>
-            <div class="flex justify-center items-center"><img src="https://i.ibb.co/vGg1DHy/logos-en-blanco-02.png" alt="Logos de Aliados" class="h-auto w-full max-w-lg rounded" onerror="this.onerror=null;this.src='https://placehold.co/512x100/1a202c/ffffff?text=Aliados';"></div>
+            <div class="flex justify-center items-center"><img src="https://i.ibb.co/vGg1DHy/logos-en-blanco-02.png"
+                    alt="Logos de Aliados" class="h-auto w-full max-w-lg rounded"
+                    onerror="this.onerror=null;this.src='https://placehold.co/512x100/1a202c/ffffff?text=Aliados';">
+            </div>
         </div>
     </div>
 
@@ -785,7 +1077,8 @@
     <div id="podcast-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="modal-close-button" class="modal-close-btn">×</button>
-            <img id="modal-podcast-image" src="" alt="Imagen de Portada del Podcast" class="w-full h-48 object-cover rounded-md mb-4">
+            <img id="modal-podcast-image" src="" alt="Imagen de Portada del Podcast"
+                class="w-full h-48 object-cover rounded-md mb-4">
             <h2 id="modal-podcast-title" class="text-xl font-bold mb-2 text-orange-400"></h2>
             <div class="mb-3">
                 <h3 class="text-md font-semibold text-orange-300 mb-1">Descripción:</h3>
@@ -795,22 +1088,30 @@
                 <h3 class="text-md font-semibold text-orange-300 mb-1">Autores:</h3>
                 <p id="modal-podcast-authors" class="text-xs text-gray-300"></p>
             </div>
-             <div class="mb-4 flex flex-wrap gap-2 items-center">
-                <a id="modal-article-link" href="#" target="_blank" class="inline-block bg-gray-600 hover:bg-gray-500 text-white font-semibold py-1 px-3 rounded-lg text-xs">Ver Artículo Original</a>
+            <div class="mb-4 flex flex-wrap gap-2 items-center">
+                <a id="modal-article-link" href="#" target="_blank"
+                    class="inline-block bg-gray-600 hover:bg-gray-500 text-white font-semibold py-1 px-3 rounded-lg text-xs">Ver
+                    Artículo Original</a>
             </div>
             <div class="flex space-x-3">
-                <button id="play-es-button" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-xs flex-1">Reproducir en Español</button>
-                <button id="play-en-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-xs flex-1">Play in English</button>
+                <button id="play-es-button"
+                    class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-xs flex-1">Reproducir
+                    en Español</button>
+                <button id="play-en-button"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center space-x-2 text-xs flex-1">Play
+                    in English</button>
             </div>
         </div>
     </div>
-    
+
     <div id="llm-info-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-2">
-                 <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1" />
+                <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1" />
                     </svg>
                     Datos Divergentes
                 </h2>
@@ -827,13 +1128,13 @@
 
     <!-- Reproductor de Audio -->
     <audio id="master-audio-player" preload="metadata"></audio>
-    
+
     <!-- TODO EL JAVASCRIPT DE LA APLICACIÓN -->
     <script>
         // --- Constantes y Variables Globales ---
         const STREAM_URL = 'https://stream.zeno.fm/rn5zosh0x4ouv';
         const METADATA_API_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/rn5zosh0x4ouv';
-        
+
         let masterAudio, isPlaying = false, currentAudioSource = 'stream', currentPodcast = null, metadataEventSource = null;
         let volumeFeedbackTimeout = null;
         let activeSectionId = null;
@@ -909,11 +1210,11 @@
             setupEventListeners();
             updateBackgroundImage();
         }
-        
+
         // --- Lógica de la Interfaz de Usuario (UI) ---
 
         function showToast(message) {
-            if(dom.feedbackToast) {
+            if (dom.feedbackToast) {
                 dom.feedbackToast.textContent = message;
                 dom.feedbackToast.classList.add('show');
                 setTimeout(() => { dom.feedbackToast.classList.remove('show'); }, 3000);
@@ -956,7 +1257,7 @@
                 });
             }
         }
-        
+
         function pauseAudio() {
             masterAudio.pause();
         }
@@ -968,7 +1269,7 @@
                 playAudio();
             }
         }
-        
+
         function switchToStream(autoplay = true) {
             pauseAudio();
             currentAudioSource = 'stream';
@@ -988,14 +1289,14 @@
                 playAudio();
             }
         }
-        
+
         function playPodcast(podcast, lang) {
-            closeAll(); 
+            closeAll();
             pauseAudio();
-            currentAudioSource = 'podcast'; 
+            currentAudioSource = 'podcast';
             currentPodcast = podcast;
             masterAudio.src = lang === 'es' ? podcast.audioEs : podcast.audioEn;
-            masterAudio.load(); 
+            masterAudio.load();
             playAudio();
             updateFloatingMetadataDisplay({
                 title: lang === 'es' ? podcast.titleEs : podcast.titleEn,
@@ -1011,7 +1312,7 @@
             let newVolume = masterAudio.volume + amount;
             newVolume = Math.max(0, Math.min(1, newVolume)); // Limitar entre 0 y 1
             masterAudio.volume = newVolume;
-            
+
             if (volumeFeedbackTimeout) clearTimeout(volumeFeedbackTimeout);
             dom.volumeFeedbackBar.style.height = `${masterAudio.volume * 100}%`;
             dom.volumeFeedbackContainer.style.opacity = '1';
@@ -1028,12 +1329,12 @@
             activeSectionId = null;
             dom.closeSectionButton.classList.add("hidden");
         }
-        
+
         function showSection(sectionName) {
             const sectionId = sectionName + "-section";
             const isCurrentlyActive = activeSectionId === sectionId;
-            closeAll(); 
-        
+            closeAll();
+
             if (!isCurrentlyActive) {
                 const sectionElement = document.getElementById(sectionId);
                 sectionElement.classList.add("active");
@@ -1043,7 +1344,7 @@
                 dom.playerMainContainer.style.pointerEvents = "none";
             }
         }
-        
+
         function toggleShows() {
             const isVisible = dom.showsContainer.classList.contains("visible");
             closeAll();
@@ -1053,7 +1354,7 @@
         }
 
         function openPodcastModal(podcast) {
-            currentPodcast = podcast; 
+            currentPodcast = podcast;
             dom.modalTitle.textContent = podcast.titleEs;
             const cardImg = document.querySelector(`.podcast-card[data-index='${podcastData.indexOf(podcast)}'] img`);
             dom.modalImg.src = cardImg ? cardImg.src : 'https://placehold.co/300x128/2d3748/fb923c?text=Podcast';
@@ -1069,8 +1370,8 @@
             if (metadataEventSource) metadataEventSource.close();
             metadataEventSource = new EventSource(METADATA_API_URL);
             dom.floatingMetadataModal.classList.add('visible');
-            metadataEventSource.onmessage = function(event) {
-                if(currentAudioSource !== 'stream') return;
+            metadataEventSource.onmessage = function (event) {
+                if (currentAudioSource !== 'stream') return;
                 try {
                     const data = JSON.parse(event.data);
                     const streamTitle = data.streamTitle || '';
@@ -1078,7 +1379,7 @@
                     const artist = parts.length > 1 ? parts.shift().trim() : 'Radio Divergentes';
                     const title = parts.join(' - ').trim() || streamTitle;
                     updateFloatingMetadataDisplay({ title, artist });
-                } catch (e) { 
+                } catch (e) {
                     updateFloatingMetadataDisplay({ title: event.data, artist: 'Radio Divergentes' });
                 }
             };
@@ -1127,7 +1428,7 @@
                 dom.llmLoadingSpinner.classList.add('hidden');
             }
         }
-        
+
         async function updateBackgroundImage() {
             console.log("Iniciando la carga de la imagen de fondo...");
             const functionUrl = "/api/generate-image";
@@ -1147,8 +1448,8 @@
             }
         }
 
-        function populatePodcastCards(){
-            if(dom.podcastCarousel){
+        function populatePodcastCards() {
+            if (dom.podcastCarousel) {
                 dom.podcastCarousel.innerHTML = "";
                 podcastData.forEach((podcast, index) => {
                     const card = document.createElement("div");
@@ -1164,18 +1465,18 @@
                 });
             }
         }
-        
+
         // --- Configuración de Event Listeners ---
-        function setupEventListeners(){
+        function setupEventListeners() {
             dom.playBtn.addEventListener("click", togglePlayPause);
             dom.volumeUpBtn.addEventListener("click", () => changeVolume(0.1));
             dom.volumeDownBtn.addEventListener("click", () => changeVolume(-0.1));
-            
-            masterAudio.addEventListener("ended", () => { if(currentAudioSource === 'podcast') { pauseAudio(); switchToStream(false); } });
+
+            masterAudio.addEventListener("ended", () => { if (currentAudioSource === 'podcast') { pauseAudio(); switchToStream(false); } });
             masterAudio.addEventListener('playing', () => { isPlaying = true; updatePlayButtonUI(); });
             masterAudio.addEventListener('pause', () => { isPlaying = false; updatePlayButtonUI(); });
             masterAudio.addEventListener('error', () => { updatePlayButtonUI(); });
-            
+
             dom.podcastCarousel.addEventListener("click", e => {
                 const card = e.target.closest(".podcast-card");
                 if (card) {
@@ -1183,14 +1484,14 @@
                     openPodcastModal(podcastData[podcastIndex]);
                 }
             });
-            
-            dom.playEsBtn.addEventListener("click", () => { if(currentPodcast) playPodcast(currentPodcast, "es"); });
-            dom.playEnBtn.addEventListener("click", () => { if(currentPodcast) playPodcast(currentPodcast, "en"); });
-            
+
+            dom.playEsBtn.addEventListener("click", () => { if (currentPodcast) playPodcast(currentPodcast, "es"); });
+            dom.playEnBtn.addEventListener("click", () => { if (currentPodcast) playPodcast(currentPodcast, "en"); });
+
             const closeModal = () => dom.podcastModal.classList.remove("active");
             dom.modalCloseBtn.addEventListener("click", closeModal);
-            dom.podcastModal.addEventListener("click", e => { if(e.target === dom.podcastModal) closeModal(); });
-            
+            dom.podcastModal.addEventListener("click", e => { if (e.target === dom.podcastModal) closeModal(); });
+
             dom.viewInfoIcon.addEventListener('click', () => {
                 if (currentAudioSource === 'podcast' && currentPodcast) {
                     openPodcastModal(currentPodcast);
@@ -1202,16 +1503,16 @@
             dom.streamInfoIcon.addEventListener('click', () => {
                 handleLlmInfoRequest();
             });
-            
+
             dom.logoLiveButton.addEventListener('click', () => switchToStream(true));
 
             const closeLlmModal = () => dom.llmInfoModal.classList.remove("active");
             dom.llmModalCloseButton.addEventListener("click", closeLlmModal);
-            dom.llmInfoModal.addEventListener("click", e => { if(e.target === dom.llmInfoModal) closeLlmModal(); });
+            dom.llmInfoModal.addEventListener("click", e => { if (e.target === dom.llmInfoModal) closeLlmModal(); });
 
             document.getElementById("carousel-arrow-left").addEventListener("click", () => { dom.podcastCarousel.scrollLeft -= dom.podcastCarousel.offsetWidth; });
             document.getElementById("carousel-arrow-right").addEventListener("click", () => { dom.podcastCarousel.scrollLeft += dom.podcastCarousel.offsetWidth; });
-            
+
             document.getElementById('share-button').addEventListener('click', () => {
                 const urlToCopy = window.location.href || 'https://divergentes-webapp-radio.vercel.app/'; // URL por defecto
                 navigator.clipboard.writeText(urlToCopy).then(() => {
@@ -1245,4 +1546,5 @@
     ChatbroLoader({encodedChatId: '797qa', minimized: true, position: 'absolute', offsetY: -250});
     </script> -->
 </body>
+
 </html>
