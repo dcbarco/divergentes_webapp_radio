@@ -117,9 +117,9 @@
                         container.style.left = '5px';
                         container.style.right = '5px';
                         container.style.width = 'auto';
-                        container.style.bottom = '120px';
-                        container.style.height = 'auto';
-                        container.style.maxHeight = 'calc(100vh - 200px)';
+                        container.style.bottom = '135px';
+                        container.style.height = 'calc(100vh - 150px)';
+                        container.style.maxHeight = 'calc(100vh - 150px)';
                     } else {
                         container.style.left = '';
                         container.style.right = '20px';
@@ -133,6 +133,7 @@
 
                 const applyTogglePosition = () => {
                     toggleBtn.style.bottom = mobileQuery.matches ? '70px' : '20px';
+                    toggleBtn.style.top = '';
                     toggleBtn.style.right = '20px';
                 };
                 applyTogglePosition();
